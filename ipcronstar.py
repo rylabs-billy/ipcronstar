@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# # -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 #
 # Author: Billy Thompson <rylabs@protonmail.com>
 # Date: 2020-10-05
