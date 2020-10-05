@@ -5,7 +5,7 @@
 #
 # iproute2 and cron wrapper for statically configuring IPv4 and IPv6 addresses
 
-import subprocess, shlex, shutl, getpass, os
+import subprocess, shlex, shutil, getpass, os
 from sys import argv
 
 args = argv
@@ -15,7 +15,7 @@ config = path + 'ipcronstar.lst'
 ipaddrs = args[2:]
 usage = '''
     Simple adding/removing IPv4 and IPv6 addresses without modifying
-    interface configuration or network scripts. The iproute2 package 
+    interface configuration file or network scripts. The iproute2 package 
     must be installed.
     
     Usage: ipcronstar.py -a [address/24] [address/64] [address/56] ...
@@ -26,6 +26,7 @@ usage = '''
     '''
 
 def add_remove_ips(action):
+    '''Add or remove IP sddresses'''
     global ipaddrs
     
     try:
@@ -39,7 +40,8 @@ def add_remove_ips(action):
         print(e)
         exit()
 
-def add_permenant():
+def add_permanent():
+    '''Permanently add IP addresses'''
     global path, ipaddrs, config
 
     try:
@@ -47,6 +49,7 @@ def add_permenant():
     except FileExistsError:
         pass
     
+    # check for existing IPs to prevent writing duplicates
     existing_addrs = []
     if os.path.exists(config):
         with open(config, 'r') as f:
@@ -54,28 +57,31 @@ def add_permenant():
     
     # write config file
     ips = [ip+'\n' for ip in ipaddrs if ip not in existing_addrs]
-    with open(config_file, 'a') as f:
+    with open(config, 'a') as f:
         f.writelines(ips)
 
     # prepare cron
     src = __file__
-    os.chmod(src, 0o700) # secure file permissions for cron script 
+    os.chmod(src, 0o700) # secure permissions for cron script 
     dst = path + __file__
     shutil.copy(src, dst)
     cron_entry = '@reboot         root    {} --restore\n'.format(dst)
 
-    # write crontab
+    # write crontab entry
     try:
+        # catch error if crontab doesn't exists yet
         subprocess.check_output((['crontab', '-l']), stderr=subprocess.STDOUT, shell=False)
     except subprocess.SubprocessError:
         with open('mycron', 'w') as f: 
             pass
     else:
+        # if conntab does exist then dump to mycron file
         subprocess.call(('crontab -l > mycron'), stderr=subprocess.STDOUT, shell=True)    
     
     try:
         with open('mycron', 'r') as f:
             cron_file = f.read()
+            # prevent duplicates
             if cron_entry not in cron_file:
                 with open('mycron', 'a') as f:
                     f.write(cron_entry)
@@ -87,22 +93,26 @@ def add_permenant():
 
     add_remove_ips('add')
 
-def remove_permenant():
+def remove_permanent():
+    '''Permanently remove IP addresses'''
     global path, ipaddrs
 
     try:
+        # get list of IPs in config
         with open(config, 'r') as f:
-            addrs = f.readlines()
+            existing_addrs = f.readlines()
     except Exception as e:
         print(e)
         exit()
 
-    for ip in addrs:
+    # remove specified IPs from config
+    for ip in existing_addrs:
         if ip in ipaddrs:
-            del addrs[ip]
+            del existing_addrs[ip]
     
-    ips = [ip+'\n' for ip in addrs]
+    ips = [ip+'\n' for ip in existing_addrs]
     try:
+        # write updated config
         with open(config, 'w') as f:
             f.writelines(ips)
     except Exception as e:
@@ -112,6 +122,7 @@ def remove_permenant():
     add_remove_ips('del')
     
 def restore_ips():
+    '''Restore IP addresses from config'''
     global config, ipaddrs
 
     try:
@@ -120,7 +131,7 @@ def restore_ips():
         add_remove_ips('add')
     except Exception as e:
         print(e)
-        print('error reading from /etc/.ipcronstar')
+        print('error reading from {}'.format(config))
         exit()
 
 def main():
@@ -136,9 +147,9 @@ def main():
     elif args[1] == '-r':
         add_remove_ips('del')
     elif args[1] == '-A':
-        add_permenant()
+        add_permanent()
     elif args[1] == '-R':
-        remove_permenant()
+        remove_permanent()
     else:
         restore_ips()
 
