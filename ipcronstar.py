@@ -1,9 +1,8 @@
 #!/usr/bin/env python3
-
-# IP Cronstar*
-# Author: Billy Thompson
+# # -*- coding: utf-8 -*-
 #
-# iproute2 and cron wrapper for statically configuring IPv4 and IPv6 addresses
+# Author: Billy Thompson <rylabs@protonmail.com>
+# Date: 2020-10-05
 
 import subprocess, shlex, shutil, getpass, os
 from sys import argv
