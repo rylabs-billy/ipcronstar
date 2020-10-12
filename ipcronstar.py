@@ -9,7 +9,7 @@ from sys import argv
 
 args = argv
 user = getpass.getuser()
-path = '/home/{}/.ipcronstar/'.format(user)
+path = '/root/.ipcronstar/'
 config = path + 'ipcronstar.lst'
 ipaddrs = args[2:]
 usage = '''
@@ -59,36 +59,20 @@ def add_permanent():
     with open(config, 'a') as f:
         f.writelines(ips)
 
-    # prepare cron
-    src = __file__
-    os.chmod(src, 0o700) # secure permissions for cron script 
-    dst = path + __file__
-    shutil.copy(src, dst)
-    cron_entry = '@reboot         root    {} --restore\n'.format(dst)
-
-    # write crontab entry
-    try:
-        # catch error if crontab doesn't exists yet
-        subprocess.check_output((['crontab', '-l']), stderr=subprocess.STDOUT, shell=False)
-    except subprocess.SubprocessError:
-        with open('mycron', 'w') as f: 
-            pass
-    else:
-        # if conntab does exist then dump to mycron file
-        subprocess.call(('crontab -l > mycron'), stderr=subprocess.STDOUT, shell=True)    
-    
-    try:
-        with open('mycron', 'r') as f:
-            cron_file = f.read()
-            # prevent duplicates
-            if cron_entry not in cron_file:
-                with open('mycron', 'a') as f:
-                    f.write(cron_entry)
-        subprocess.call(('crontab mycron'), stderr=subprocess.STDOUT, shell=True)
-        os.remove('mycron')                
-    except Exception as e:
-        print(e)
-        exit()
+    # create service
+    script = __file__
+    os.chmod(script, 0o700) # secure permissions 
+    script_dst = path + 'ipcronstar.py'
+    shutil.copy(script, script_dst)
+    #with open('ipcronstar.service', 'r') as f:
+    #    service = f.read()
+    os.chmod('ipcronstar.service', 0o755)
+    service_dst = '/etc/systemd/system/ipcronstar.service'
+    shutil.copy('ipcronstar.service', service_dst)
+    daemon_reload = 'systemctl daemon-reload'
+    enable_service = 'systemctl enable ipcronstar'
+    subprocess.Popen(shlex.split(daemon_reload), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    subprocess.Popen(shlex.split(enable_service), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
     add_remove_ips('add')
 
@@ -136,8 +120,10 @@ def restore_ips():
 def main():
     global args, usage
     
-    opts = ('-a', '-A', '-r', '-R', '--restore')
-    if len(args) < 3 or args[1] not in opts:
+    opts = ('-a', '-A', '-r', '-R')
+    if len(args) == 2 and args[1] == '--restore':
+        pass
+    elif len(args) < 3 or args[1] not in opts:
         print(usage)
         exit()
 

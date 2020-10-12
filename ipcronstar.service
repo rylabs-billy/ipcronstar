@@ -1,0 +1,11 @@
+[Unit]
+Description=IPCronstar Restore
+After=network.target
+
+[Service]
+ExecStartPre=/bin/sh -c 'until ping -c1 google.com; do sleep 1; done;'
+ExecStart=/bin/sh -c '/root/.ipcronstar/ipcronstar.py --restore'
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
