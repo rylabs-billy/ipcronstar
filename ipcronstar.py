@@ -49,15 +49,19 @@ def add_permanent():
         pass
     
     # check for existing IPs to prevent writing duplicates
-    existing_addrs = []
-    if os.path.exists(config):
-        with open(config, 'r') as f:
-            existing_addrs = f.readlines()
+    try:
+        existing_addrs = []
+        if os.path.exists(config):
+            with open(config, 'r') as f:
+                existing_addrs = [x.strip('\n') for x in f]
     
-    # write config file
-    ips = [ip+'\n' for ip in ipaddrs if ip not in existing_addrs]
-    with open(config, 'a') as f:
-        f.writelines(ips)
+        # write config file
+        ips = [ip+'\n' for ip in ipaddrs if ip not in existing_addrs]
+        with open(config, 'a') as f:
+            f.writelines(ips)
+    except Exception as e:
+        print(e)
+        exit()
 
     # create service
     script = __file__
@@ -83,23 +87,21 @@ def remove_permanent():
     try:
         # get list of IPs in config
         with open(config, 'r') as f:
-            existing_addrs = f.readlines()
-    except Exception as e:
-        print(e)
-        exit()
+            existing_addrs = [x.strip('\n') for x in f]
 
-    # remove specified IPs from config
-    for ip in existing_addrs:
-        if ip in ipaddrs:
-            del existing_addrs[ip]
-    
-    ips = [ip+'\n' for ip in existing_addrs]
-    try:
+        # remove specified IPs from config
+        [existing_addrs.remove(ip) for ip in ipaddrs]
+        ips = [ip+'\n' for ip in existing_addrs]
+
         # write updated config
         with open(config, 'w') as f:
             f.writelines(ips)
     except Exception as e:
-        print(e)
+        e = str(e)
+        if e == "list.remove(x): x not in list":
+            pass
+        else:
+            print(e)
         exit()
     
     add_remove_ips('del')
@@ -110,7 +112,7 @@ def restore_ips():
 
     try:
         with open(config, 'r') as f:
-            ipaddrs = f.readlines()
+            ipaddrs = [x.strip('\n') for x in f]
         add_remove_ips('add')
     except Exception as e:
         print(e)
