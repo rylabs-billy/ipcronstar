@@ -2,6 +2,20 @@
 import os, shutil, shlex, subprocess
 from ipcronstar import add_remove, ipaddrs, config, path
 
+service = '''
+[Unit]
+Description=IPCronstar Restore
+After=network.target
+
+[Service]
+ExecStartPre=/bin/sh -c 'until ping -c1 google.com; do sleep 1; done;'
+ExecStart=/bin/sh -c 'ipcronstar --restore'
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+'''
+
 def add():
     '''Permanently add IP addresses'''
     # make config file
@@ -26,15 +40,16 @@ def add():
         exit()
 
     # create service
-    script = __file__
-    os.chmod(script, 0o700) # secure permissions 
-    script_dst = path + 'ipcronstar.py'
-    shutil.copy(script, script_dst)
+    #script = __file__
+    #os.chmod(script, 0o700) # secure permissions 
+    #script_dst = path + 'ipcronstar.py'
+    #shutil.copy(script, script_dst)
     #with open('ipcronstar.service', 'r') as f:
     #    service = f.read()
-    os.chmod('ipcronstar.service', 0o755)
-    service_dst = '/etc/systemd/system/ipcronstar.service'
-    shutil.copy('ipcronstar.service', service_dst)
+    #dir_path = os.path.dirname(os.path.realpath(__file__))
+    with open('/etc/systemd/system/ipcronstar.service') as f:
+        f.write(service)
+    os.chmod('/etc/systemd/system/ipcronstar.service', 0o755)
     daemon_reload = 'systemctl daemon-reload'
     enable_service = 'systemctl enable ipcronstar'
     subprocess.Popen(shlex.split(daemon_reload), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
