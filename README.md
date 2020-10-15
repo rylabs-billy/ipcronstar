@@ -2,6 +2,23 @@
 
 A simple method of adding/removing IPv4 and IPv6 addresses without modifying interface configuration file or network scripts on Linux systems. This is particulaly helpful for cloud servers that benefit from network helper functions that would otherwise have to be disabled for static IP configuration. The `iproute2` package must be installed. Takes any number of IPv4 or IPv6 addresses.
 
+Requires Python >= 3.1.
+
+Tested on:
+- Debian 10 
+- Debian 9 
+- Debian 8 
+- Ubuntu 20.04
+- Ubuntu 19.04 
+- Ubuntu 18.04
+- Ubuntu 16.04
+- Ubuntu 18.04
+- CentOS 8
+- CentOS 7
+- Arch Linux
+- OpenSUSE
+
+
 Usage:
 ```
 ipcronstar.py [-a|-r|-A|-R|--restore] [address/24] [address/64] [address/56] ...
