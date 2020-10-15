@@ -4,7 +4,6 @@ setup.py
 ipcronstar/__init__.py
 ipcronstar/__main__.py
 ipcronstar/add_remove.py
-ipcronstar/ipcronstar.service
 ipcronstar/permanent.py
 ipcronstar/restore.py
 ipcronstar.egg-info/PKG-INFO
