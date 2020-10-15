@@ -1,3 +1,0 @@
-[console_scripts]
-ipcronstar = ipcronstar.__main__:main
-

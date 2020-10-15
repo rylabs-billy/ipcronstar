@@ -47,7 +47,7 @@ def add():
     #with open('ipcronstar.service', 'r') as f:
     #    service = f.read()
     #dir_path = os.path.dirname(os.path.realpath(__file__))
-    with open('/etc/systemd/system/ipcronstar.service') as f:
+    with open('/etc/systemd/system/ipcronstar.service', 'w') as f:
         f.write(service)
     os.chmod('/etc/systemd/system/ipcronstar.service', 0o755)
     daemon_reload = 'systemctl daemon-reload'
