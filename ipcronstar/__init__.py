@@ -1,5 +1,5 @@
 # __init__.py
-__version__ = '1.0.3'
+__version__ = '1.0.4'
 
 from sys import argv
 args = argv
