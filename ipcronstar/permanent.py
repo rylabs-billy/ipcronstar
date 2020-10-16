@@ -2,8 +2,7 @@
 import os, shutil, shlex, subprocess
 from ipcronstar import add_remove, ipaddrs, config, path
 
-service = '''
-[Unit]
+service = '''[Unit]
 Description=IPCronstar Restore
 After=network.target
 
@@ -46,12 +45,16 @@ def add():
     #shutil.copy(script, script_dst)
     #with open('ipcronstar.service', 'r') as f:
     #    service = f.read()
-    #dir_path = os.path.dirname(os.path.realpath(__file__))
-    with open('/etc/systemd/system/ipcronstar.service', 'w') as f:
+    #dir_path = os.path.dirname(os.path.realpath(__file__)
+    with open('ipcronstar.service', 'w') as f:
         f.write(service)
-    os.chmod('/etc/systemd/system/ipcronstar.service', 0o755)
+    os.chmod('ipcronstar.service', 0o644)
+    shutil.copy('ipcronstar.service', '/lib/systemd/system/ipcronstar.service')
+    #os.chmod('/etc/systemd/system/ipcronstar.service', 0o755)
+    symlink = "cd /etc/systemd/system/ && ln -s /lib/systemd/system/ipcronstar.service ipcronstar.service"
     daemon_reload = 'systemctl daemon-reload'
     enable_service = 'systemctl enable ipcronstar'
+    subprocess.Popen(shlex.split(symlink), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     subprocess.Popen(shlex.split(daemon_reload), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     subprocess.Popen(shlex.split(enable_service), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
