@@ -2,7 +2,7 @@
 #import subprocess, shlex, shutil, getpass, os
 #from sys import argv
 
-from . import args, usage, add_remove, permanent, restore
+from . import args, usage, ipaddrs, add_remove, permanent, restore
 
 def main():
     opts = ('-a', '-A', '-r', '-R')
@@ -13,9 +13,9 @@ def main():
         exit()
 
     if args[1] == '-a':
-        add_remove.add()
+        add_remove.add(ipaddrs)
     elif args[1] == '-r':
-        add_remove.remove()
+        add_remove.remove(ipaddrs)
     elif args[1] == '-A':
         permanent.add()
     elif args[1] == '-R':

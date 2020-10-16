@@ -39,26 +39,23 @@ def add():
         exit()
 
     # create service
-    #script = __file__
-    #os.chmod(script, 0o700) # secure permissions 
-    #script_dst = path + 'ipcronstar.py'
-    #shutil.copy(script, script_dst)
-    #with open('ipcronstar.service', 'r') as f:
-    #    service = f.read()
-    #dir_path = os.path.dirname(os.path.realpath(__file__)
-    with open('ipcronstar.service', 'w') as f:
-        f.write(service)
-    os.chmod('ipcronstar.service', 0o644)
-    shutil.copy('ipcronstar.service', '/lib/systemd/system/ipcronstar.service')
-    #os.chmod('/etc/systemd/system/ipcronstar.service', 0o755)
-    symlink = "cd /etc/systemd/system/ && ln -s /lib/systemd/system/ipcronstar.service ipcronstar.service"
-    daemon_reload = 'systemctl daemon-reload'
-    enable_service = 'systemctl enable ipcronstar'
-    subprocess.Popen(shlex.split(symlink), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    subprocess.Popen(shlex.split(daemon_reload), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-    subprocess.Popen(shlex.split(enable_service), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    try:
+        with open('ipcronstar.service', 'w') as f:
+            f.write(service)
+        os.chmod('ipcronstar.service', 0o644)
+        shutil.copy('ipcronstar.service', '/lib/systemd/system/ipcronstar.service')
+        os.remove('ipcronstar.service')
+        os.symlink('/lib/systemd/system/ipcronstar.service', '/etc/systemd/system/ipcronstar.service')
+        daemon_reload = 'systemctl daemon-reload'
+        enable_service = 'systemctl enable ipcronstar'
+        subprocess.Popen(shlex.split(daemon_reload), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        subprocess.Popen(shlex.split(enable_service), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    except FileExistsError:
+        pass
+    except Exception as e:
+        print(e)
 
-    add_remove.add()
+    add_remove.add(ipaddrs)
 
 def remove():
     '''Permanently remove IP addresses'''
@@ -82,4 +79,4 @@ def remove():
             print(e)
         exit()
     
-    add_remove.remove()
+    add_remove.remove(ipaddrs)

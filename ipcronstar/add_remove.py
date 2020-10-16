@@ -2,7 +2,7 @@
 import subprocess, shlex
 from . import ipaddrs
 
-def add():
+def add(ipaddrs):
     '''Add IP addresses''' 
     try:
         for ip in ipaddrs:
@@ -15,7 +15,7 @@ def add():
         print(e)
         exit()
 
-def remove():
+def remove(ipaddrs):
     '''Add IP addresses''' 
     try:
         for ip in ipaddrs:
