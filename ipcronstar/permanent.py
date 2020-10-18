@@ -1,6 +1,6 @@
 # permanent.py
 import os, shutil, shlex, subprocess
-from ipcronstar import add_remove, ipaddrs, config, path
+from . import add_remove, ipaddrs, config, path
 
 service = '''[Unit]
 Description=IPCronstar Restore

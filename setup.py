@@ -11,7 +11,7 @@ README = (HERE / "README.md").read_text()
 # This call to setup() does all the work
 setup(
     name='ipcronstar',
-    version='1.0.4',
+    version='1.0.5',
     description='Add additional IPV4 and IPv6 addresses to Linux',
     long_description=README,
     long_description_content_type='text/markdown',
