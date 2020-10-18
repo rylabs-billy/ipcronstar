@@ -7,7 +7,7 @@ from . import args, usage, ipaddrs, add_remove, permanent, restore
 def main():
     #opts = ('-a', '-A', '-r', '-R')
     if len(args) == 2 and args[1] == '--restore':
-        restore
+        restore.run()
     elif len(args) >= 3:
         if args[1] == '-a':
             add_remove.add(ipaddrs)
