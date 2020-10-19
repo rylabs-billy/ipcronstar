@@ -18,7 +18,6 @@ def main():
         elif args[1] == '-R':
             permanent.remove()
     else:
-        print(args[1])
         print(usage)
 
 # main
