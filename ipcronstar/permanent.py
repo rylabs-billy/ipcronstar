@@ -7,7 +7,7 @@ Description=IPCronstar Restore
 After=network.target
 
 [Service]
-ExecStartPre=/bin/sh -c 'until ping -c1 google.com; do sleep 1; done;'
+ExecStartPre=/bin/sh -c 'until ping -c 1 8.8.8.8; do sleep 1; done;'
 ExecStart=/bin/sh -c 'ipcronstar --restore'
 Restart=on-failure
 
@@ -45,9 +45,8 @@ def add():
         os.chmod('ipcronstar.service', 0o644)
         shutil.copy('ipcronstar.service', '/lib/systemd/system/ipcronstar.service')
         os.remove('ipcronstar.service')
-        os.symlink('/lib/systemd/system/ipcronstar.service', '/etc/systemd/system/ipcronstar.service')
         daemon_reload = 'systemctl daemon-reload'
-        enable_service = 'systemctl enable ipcronstar'
+        enable_service = 'systemctl enable ipcronstar.service'
         subprocess.Popen(shlex.split(daemon_reload), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         subprocess.Popen(shlex.split(enable_service), stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
     except FileExistsError:
